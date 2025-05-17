@@ -417,46 +417,44 @@ def remove_item(request):
 
 @login_required
 def view_cart(request):
-    total_items = 0
-    cart_items = []
-    subtotal_amount = 0  # Tổng tiền trước giảm giá
-    discount_amount = 0  # Số tiền giảm giá từ voucher
-    total_amount = 0  # Tổng tiền sau giảm giá
-    voucher_code = None  # Mã voucher
-
     user = request.user
+
     cart_items = CartItem.objects.filter(user=user)
     total_items = cart_items.count()
 
-    # Tính tổng tiền của giỏ hàng và tổng từng sản phẩm
+    subtotal_amount = 0  # Tổng tiền trước giảm giá
+    discount_amount = 0  # Số tiền giảm giá từ voucher
+    total_amount = 0     # Tổng tiền sau giảm giá
+    voucher_code = None  # Mã voucher
+
+    # Tính tổng tiền từng item
+    valid_cart_items = []
     for item in cart_items:
         try:
-            # Lấy giá của sản phẩm theo kích cỡ trong giỏ hàng
             product_size = ProductSize.objects.get(product=item.product, size=item.size)
-            item.price = product_size.price  # Thêm giá của sản phẩm vào item
-            item.total_price = product_size.price * item.quantity  # Tổng tiền cho từng item
-            
-            subtotal_amount += item.total_price  # Cộng tổng tiền trước giảm giá
-
+            item.price = product_size.price
+            item.total_price = product_size.price * item.quantity
+            subtotal_amount += item.total_price
+            valid_cart_items.append(item)
         except ProductSize.DoesNotExist:
-            # Nếu không tìm thấy giá cho sản phẩm theo kích cỡ, hiển thị lỗi
-            messages.error(request, f"Không tìm thấy giá cho sản phẩm {item.product.title} với kích cỡ {item.size}")
+            messages.error(request, f"Không tìm thấy giá cho sản phẩm '{item.product.title}' với kích cỡ '{item.size}'")
 
-    # Lấy thông tin voucher từ session (nếu có)
-    if 'voucher_code' in request.session:
-        voucher_code = request.session.get('voucher_code')
+    # Lấy thông tin voucher nếu có
+    voucher_code = request.session.get('voucher_code')
+    try:
         discount_amount = float(request.session.get('voucher_discount', 0))
+    except (ValueError, TypeError):
+        discount_amount = 0
 
-    # Tính tổng tiền sau khi áp dụng voucher
     total_amount = max(0, subtotal_amount - discount_amount)
 
     context = {
-        'cart_items': cart_items,
-        'subtotal_amount': subtotal_amount,  # Tổng tiền trước giảm giá
-        'discount_amount': discount_amount,  # Số tiền giảm giá
-        'total_amount': total_amount,  # Tổng tiền sau giảm giá
-        'total_items': total_items,  # Tổng số sản phẩm trong giỏ hàng
-        'voucher_code': voucher_code,  # Mã voucher từ session
+        'cart_items': valid_cart_items,
+        'subtotal_amount': subtotal_amount,
+        'discount_amount': discount_amount,
+        'total_amount': total_amount,
+        'total_items': total_items,
+        'voucher_code': voucher_code,
     }
 
     return render(request, 'shop/cart_page.html', context)

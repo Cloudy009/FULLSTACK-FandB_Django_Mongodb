@@ -32,13 +32,18 @@ DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
 # HOSTs List
 ALLOWED_HOSTS = ['*']
 
+CORS_ALLOWED_ORIGINS = [
+    'https://af18-1-52-184-56.ngrok-free.app',  # Thay thế với URL ngrok của bạn
+]
 # Add here your deployment HOSTS
 CSRF_TRUSTED_ORIGINS = ['http://localhost:8000','http://127.0.0.1:8000', 'http://localhost:5085', 'http://127.0.0.1:8000', 'http://127.0.0.1:5085', 'https://af18-1-52-184-56.ngrok-free.app', 'https://example.com']
 
 RENDER_EXTERNAL_HOSTNAME = os.environ.get('RENDER_EXTERNAL_HOSTNAME')
+
 if RENDER_EXTERNAL_HOSTNAME:    
     ALLOWED_HOSTS.append(RENDER_EXTERNAL_HOSTNAME)
-
+    CSRF_TRUSTED_ORIGINS.append('https://' + RENDER_EXTERNAL_HOSTNAME)
+    CSRF_TRUSTED_ORIGINS.append('http://' + RENDER_EXTERNAL_HOSTNAME)
 # Application definition
 SITE_ID = 2
 
@@ -129,9 +134,7 @@ MIDDLEWARE = [
 
 ]
 
-CORS_ALLOWED_ORIGINS = [
-    'https://af18-1-52-184-56.ngrok-free.app',  # Thay thế với URL ngrok của bạn
-]
+
 
 ROOT_URLCONF = "core.urls"
 
