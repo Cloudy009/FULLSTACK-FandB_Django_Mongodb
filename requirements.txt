@@ -12,7 +12,7 @@ gunicorn
 # Utilities
 daphne==3.0.2      
 requests==2.32.3
-channels<=4.0.0 
+channels==3.0.4
 django-filter
 django-cors-headers
 django-allauth
