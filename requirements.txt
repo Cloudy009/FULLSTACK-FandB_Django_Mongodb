@@ -10,9 +10,9 @@ whitenoise
 gunicorn
 
 # Utilities
-daphne==4.1.2
+daphne==3.0.2      
 requests==2.32.3
-channels<4
+channels<=4.0.0 
 django-filter
 django-cors-headers
 django-allauth
@@ -31,4 +31,4 @@ str2bool
 uvicorn
 dnspython
 sqlparse==0.2.4
-
+six
