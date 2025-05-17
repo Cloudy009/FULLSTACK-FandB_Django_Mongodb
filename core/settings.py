@@ -28,11 +28,7 @@ if not SECRET_KEY:
     SECRET_KEY = ''.join(random.choice( string.ascii_lowercase  ) for i in range( 32 ))
 
 # Render Deployment Code
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-if DEBUG:
-    DEBUG = True
-else:
-    DEBUG = False
+DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
 # HOSTs List
 ALLOWED_HOSTS = ['*']
 
