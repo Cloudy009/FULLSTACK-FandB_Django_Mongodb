@@ -119,27 +119,7 @@
         </div>
     </div>
     
-    <script>
-        document.getElementById("rotate-container").addEventListener("click", function () {
-          const svgElement = document.getElementById("rotating-svg");
-          const existingAnimation = svgElement.querySelector("animateTransform");
-      
-          if (existingAnimation) {
-            // If animation exists, remove it (stop the rotation)
-            existingAnimation.beginElement();
-          } else {
-            // If animation doesn't exist, create a new one (start the rotation)
-            const animateTransform = document.createElementNS("http://www.w3.org/2000/svg", "animateTransform");
-            animateTransform.setAttribute("attributeName", "transform");
-            animateTransform.setAttribute("type", "rotate");
-            animateTransform.setAttribute("from", "0 25 25");
-            animateTransform.setAttribute("to", "360 25 25");
-            animateTransform.setAttribute("dur", "1s");
-            animateTransform.setAttribute("repeatCount", "3");
-            svgElement.querySelector("circle").appendChild(animateTransform);
-          }
-        });
-      </script>
+    
       <script>
         // Xử lý sự kiện click cho các nút "-" và "+"
         document.querySelectorAll('.quantity-btn').forEach(button => {
