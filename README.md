@@ -1,185 +1,146 @@
-# [Django Soft Dashboard](https://appseed.us/product/soft-ui-dashboard/django/)
+# FandB-Mongodb-Django
 
-Open-source **[Django Dashboard](https://appseed.us/admin-dashboards/django/)** crafted on top of **Soft UI Dashboard**, an open-source `Bootstrap 5` design from `Creative-Tim`.
-Designed for those who like bold elements and beautiful websites. Made of hundreds of elements, designed blocks and fully coded pages, `Soft UI Dashboard` is ready to help you create stunning websites and web apps.
-
-- 👉 [Django Soft Dashboard](https://appseed.us/product/soft-ui-dashboard/django/) - `Product page`
-- 👉 [Django Soft Dashboard](https://django-soft-dash.onrender.com) - `LIVE Demo`
-
---- 
-
-## 🚀 **[Black Friday Campaign](https://appseed.us/)** is LIVE: `65%Off`
-
-> `React`, `Django`, `Flask`, and `NodeJs` starters crafted and actively supported by **AppSeed**
- 
-[![](https://github-production-user-asset-6210df.s3.amazonaws.com/51070104/280080081-1e7c91c0-612f-4418-81e7-34c363378479.jpg)](https://appseed.us/)
-
-<br />
+This project is a web-based Food & Beverage (F&B) management system developed using Django and MongoDB. It provides core functionalities for managing menu items, orders, and users within a modern admin interface.
 
 ## Features
 
-> `Have questions?` Contact **[Support](https://appseed.us/support/)** (Email & Discord) provided by **AppSeed**
-
-| Free Version                          | [PRO Version](https://appseed.us/product/soft-ui-dashboard-pro/django/)    | 🚀 Custom - $1999 (plus VAT)         |  
-| --------------------------------------| --------------------------------------| --------------------------------------|
-| ✓ **Django 4.1.12**                   | **Everything in Free**, plus:                                        | **Everything in PRO**, plus:       |
-| ✓ Best Practices                      | ✅ **Premium Bootstrap Design**                                      | ✅ **1mo Custom Development**     | 
-| ✓ `Bootstrap 5`, Soft Dashboard UI    | ✅ `OAuth` Google, GitHub                                            | ✅ **Dedicated Developer**        |
-| ✓ `Docker`                            | ✅ `Extended User Model`                                             | ✅ Weekly Sprints                 |
-| ✓ `CI/CD` Flow via Render             | ✅ `Private REPO Access`                                             | ✅ Technical SPECS                |
-| ✓ `Free Support`                      | ✅ **PRO Support** - [Email & Discord](https://appseed.us/support/)  | ✅ Documentation                  |
-| -                                     | ✅ Deployment Assistance                                             | ✅ **30 days Delivery Warranty**  |
-| ------------------------------------  | ------------------------------------                                  | ------------------------------------|
-| ✓ [LIVE Demo](https://django-soft-dash.onrender.com/)  | 🚀 [LIVE Demo](https://django-soft-dash-pro.onrender.com/) | 🛒 `Order`: **[$1999](https://appseed.gumroad.com/l/rocket-package)** (GUMROAD) |   
-
-
-![Django Admin Soft - Template project for Django provided by AppSeed.](https://user-images.githubusercontent.com/51070104/215729207-5cce250e-54da-4712-89a9-c1fd6b0a149e.png)
-
-<br />
-
-## Manual Build 
-
-> 👉 Download the code  
-
-```bash
-$ git clone https://github.com/app-generator/django-soft-ui-dashboard.git
-$ cd django-soft-ui-dashboard
-```
-
-<br />
-
-> 👉 Install modules via `VENV`  
-
-```bash
-$ virtualenv env
-$ source env/bin/activate
-$ pip install -r requirements.txt
-```
-
-<br />
-
-> 👉 Set Up Database
-
-```bash
-$ python manage.py makemigrations
-$ python manage.py migrate
-```
-
-<br />
-
-> 👉 Create the Superuser
-
-```bash
-$ python manage.py createsuperuser
-```
-
-<br />
-
-> 👉 Start the app
-
-```bash
-$ python manage.py runserver
-```
-
-At this point, the app runs at `http://127.0.0.1:8000/`. 
-
-<br />
-
-## Codebase structure
-
-The project is coded using a simple and intuitive structure presented below:
-
-```bash
-< PROJECT ROOT >
-   |
-   |-- core/                            
-   |    |-- settings.py   # Project Configuration  
-   |    |-- urls.py       # Project Routing
-   |
-   |-- home/
-   |    |-- views.py      # APP Views 
-   |    |-- urls.py       # APP Routing
-   |    |-- models.py     # APP Models 
-   |    |-- tests.py      # Tests  
-   |     
-   |-- templates/
-   |    |-- includes/     # UI components 
-   |    |-- layouts/      # Masterpages
-   |    |-- pages/        # Kit pages 
-   |
-   |-- static/   
-   |    |-- css/                                   # CSS Files 
-   |    |-- scss/                                  # SCSS Files 
-   |         |-- soft-ui-dashboard/_variables.scss # File Used for Theme Styling
-   |
-   |-- requirements.txt   # Project Dependencies
-   |
-   |-- env.sample         # ENV Configuration (default values)
-   |-- manage.py          # Start the app - Django default start script
-   |
-   |-- ************************************************************************
-```
-
-<br />
-
-## Recompile SCSS  
-
-The SCSS/CSS files used to style the Ui are saved in the `static` directory. 
-In order to update the Ui colors (primary, secondary) this procedure needs to be followed. 
-
-```bash
-$ yarn                                             # install modules
-$ vi static/scss/soft-ui-dashboard/_variables.scss # edit variables 
-$ gulp                                             # SCSS to CSS translation
-```
-
-The `_variables.scss` content defines the `primary` and `secondary` colors: 
-
-```scss
-$primary:       #cb0c9f !default;   // EDIT for customization 
-$secondary:     #8392AB !default;   // EDIT for customization 
-$info:          #17c1e8 !default;   // EDIT for customization 
-$success:       #82d616 !default;   // EDIT for customization 
-$warning:       #fbcf33 !default;   // EDIT for customization 
-$danger:        #ea0606 !default;   // EDIT for customization 
-```
-
-<br />
-
-## Deploy on [Render](https://render.com/)
-
-- Create a Blueprint instance
-  - Go to https://dashboard.render.com/blueprints this link.
-- Click `New Blueprint Instance` button.
-- Connect your `repo` which you want to deploy.
-- Fill the `Service Group Name` and click on `Update Existing Resources` button.
-- After that your deployment will start automatically.
-
-At this point, the product should be LIVE.
-
-<br />
-
-## [Django Soft Dashboard](https://appseed.us/product/soft-ui-dashboard-pro/django/) `PRO`
-
-This design is a pixel-perfect [Bootstrap 5](https://www.admin-dashboards.com/bootstrap-5-templates/) Dashboard with a fresh, new design concept. `Soft UI Dashboard PRO` is built with over 300 frontend individual elements, like buttons, inputs, navbars, nav tabs, cards, or alerts, giving you the freedom of choosing and combining.
-
-> Features: 
-
-- `Up-to-date Dependencies`
-- `Design`: [Django Theme Soft PRO](https://github.com/app-generator/django-admin-soft-pro) - `PRO Version`
-- `Sections` covered by the design:
-  - **Admin section** (reserved for superusers)
-  - **Authentication**: `Django.contrib.AUTH`, Registration
-  - **All Pages** available in for ordinary users 
-- `Docker`, `Deployment`:
-  - `CI/CD` flow via `Render`
-
-<br />
-
-![Soft UI Dashboard Pro](https://user-images.githubusercontent.com/51070104/211278814-881e0fcf-7986-4386-afee-540aa0f53bba.png)
-
-<br />
+- ✅ Django + MongoDB integration (`djongo`)
+- ✅ Admin dashboard using [Soft UI Dashboard](https://appseed.us/product/soft-ui-dashboard/django/) by AppSeed
+- ✅ Role-based access (staff/admin)
+- ✅ Product and category management
+- ✅ Order tracking and payment integration (VNPAY)
+- ✅ Google & GitHub OAuth login
+- ✅ Email notifications
 
 ---
-[Django Soft Dashboard](https://appseed.us/product/soft-ui-dashboard/django/) - **Django** starter provided by **[AppSeed](https://appseed.us/)**
-"# FandB-Mongodb" 
+
+## 🔧 Local Setup
+
+### 1. Clone the project
+
+```bash
+git clone https://github.com/yourusername/FandB-Mongodb-django.git
+cd FandB-Mongodb-django
+```
+
+### 2. Create and activate virtual environment
+# Create virtual environment
+```bash
+python -m venv venv_django_mongo
+```
+
+# Activate (choose OS)
+# On Windows:
+```bash
+.\venv_django_mongo\Scripts\activate
+```
+# On macOS/Linux:
+```bash
+source venv_django_mongo/bin/activate
+```
+
+### 3. Install dependencies
+```bash
+pip install -r requirements.txt
+```
+
+### 4. MongoDB configuration
+Create a MongoDB database named FandBShop
+Update the following section in settings.py:
+```bash
+DATABASES = {
+    'default': {
+        'ENGINE': 'djongo',
+        'NAME': 'FandBShop',
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': 'mongodb://localhost:27017',
+        },
+    }
+}
+```
+
+### 5. Configure .env file
+Create a .env file in the root directory and add:
+
+```bash
+SECRET_KEY=your-secret-key
+MONGO_URI=mongodb://localhost:27017
+
+# Google OAuth
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=your-google-key
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=your-google-secret
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI=http://127.0.0.1:8000/social-auth/complete/google-oauth2/
+
+# GitHub OAuth
+SOCIAL_AUTH_GITHUB_KEY=your-github-key
+SOCIAL_AUTH_GITHUB_SECRET=your-github-secret
+SOCIAL_AUTH_GITHUB_REDIRECT_URI=http://127.0.0.1:8000/social-auth/complete/github/
+
+# Email config
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-email-app-password
+DEFAULT_FROM_EMAIL=your-email@gmail.com
+DEFAULT_TO_EMAIL=your-email@gmail.com
+
+# VNPAY Payment
+VNPAY_RETURN_URL=http://localhost:8000/shop/payment_return
+VNPAY_PAYMENT_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+VNPAY_API_URL=https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+VNPAY_TMN_CODE=your-vnpay-tmn-code
+VNPAY_HASH_SECRET_KEY=your-vnpay-secret-key
+
+DEBUG=True
+```
+
+### 6. Apply Migrations
+
+```bash
+python manage.py makemigrations
+python manage.py migrate
+
+# Fake social_django migrations if needed
+python manage.py migrate social_django 0010 --fake
+python manage.py migrate social_django 0011 --fake
+python manage.py migrate social_django 0012 --fake
+
+python manage.py migrate
+```
+
+### 7. Create superuser
+```bash
+python manage.py createsuperuser
+```
+Follow the prompt to set up the admin credentials.
+
+### 8. Start development server
+```bash
+python manage.py runserver
+```
+Open in browser: http://127.0.0.1:8000
+
+🧩 Admin Dashboard (AppSeed)
+This project uses the open-source Django Soft UI Dashboard by AppSeed:
+Responsive UI built with Bootstrap 5
+Reusable components and modern styling
+Includes login, register, and dashboard pages
+
+🔗 Live Demo: [link] (https://django-soft-dash.onrender.com/)
+
+📁 Project Structure
+fandb/
+│
+├── core/               # Django settings and config
+├── menu/               # F&B app models, views, urls
+├── templates/          # HTML templates (Soft UI)
+├── static/             # CSS, JS, images
+├── .env                # Environment variables
+├── manage.py
+└── requirements.txt
+
+📦 Dependencies
+- Django
+- Djongo (MongoDB connector for Django)
+- social-auth-app-django
+- python-decouple
+- requests, django-crispy-forms, etc.

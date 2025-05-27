@@ -31,6 +31,14 @@
 <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
 <link rel="stylesheet" href="{% static 'css/CheckOut/check_out.css' %}">
 
+
+{% if messages %}
+  {% for message in messages %}
+    <div style="background-color: #f8d7da; color: #721c24; padding: 10px; border: 1px solid #f5c6cb; border-radius: 5px; margin-bottom: 10px;">
+      {{ message }}
+    </div>
+  {% endfor %}
+{% endif %}
 <div class="container">
     <form method="post" action="{% url 'payment' %}">
         {% csrf_token %}

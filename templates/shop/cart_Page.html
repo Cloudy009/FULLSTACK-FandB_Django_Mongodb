@@ -65,6 +65,19 @@
                                     </div>
                                 </td>
                             </tr>
+                            <!-- Nếu có ghi chú thì thêm dòng mới -->
+                            {% if item.note %}                                
+                                <tr class="note-row">
+                                    <td colspan="6" class="note-cell">
+                                        <em>
+                                            Ghi chú:
+                                            {% if item.sugar != '' %} Đường: {{ item.get_sugar_display }}{% endif %}
+                                            {% if item.tea != '' %} | Trà: {{ item.get_tea_display }}{% endif %}
+                                            {% if item.ice != '' %} | Đá: {{ item.get_ice_display }}{% endif %}
+                                        </em>
+                                    </td>
+                                </tr>
+                            {% endif %}
                         {% endfor %}
                     </tbody>
                 </table>

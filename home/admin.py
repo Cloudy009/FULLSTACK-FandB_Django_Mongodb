@@ -148,7 +148,7 @@ class HoaDonAdmin(admin.ModelAdmin):
         }),
         ('Thông tin bổ sung', {
             'classes': ('collapse',),
-            'fields': ('created_at', 'updated_at', 'loi')
+            'fields': ('created_at', 'updated_at')
         }),
     )
 

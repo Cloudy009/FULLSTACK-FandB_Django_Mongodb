@@ -203,63 +203,6 @@ def home2(request):
     }
     return render(request, 'shop/home.html', context)
 
-
-# def home2(request):
-#     total_items = 0
-#     cart_items = []
-#     recommended_user_products = []
-#     liked_recommendations = []
-
-#     room_name = None
-
-#     if request.user.is_authenticated:
-#         cart_items = CartItem.objects.filter(user=request.user)
-#         total_items = cart_items.count()
-#         room = Room.objects.filter(users=request.user).first()
-#         room_name = room.name if room else None
-        
-#         recommended_user_products = get_user_recommended_products(request.user)
-#         liked_recommendations = get_liked_products_recommendations(request.user)
-
-#     trending_products = get_trending_products()
-#     top_selling_products = get_top_selling_products()
-#     categories = Category.objects.all()
-#     category_products = get_category_products()
-
-#     DEFAULT_IMAGE = '/static/images/logoCard.png'
-
-#     new_products_raw = Product.objects.order_by('-created_at')[:10]
-#     new_products_with_images = []
-#     for product in new_products_raw:
-#         image = ProductImage.objects.filter(product=product).first()
-#         image_url = image.image if image else DEFAULT_IMAGE
-
-#         # Lấy giá nhỏ nhất trong các size (nếu có)
-#         prices = [ps.price for ps in product.productsize_set.all()]
-#         price = min(prices) if prices else (float(product.original_price) if product.original_price else 0.0)
-
-#         new_products_with_images.append({
-#             'id': product.pro_id,
-#             'title': product.title,
-#             'image': image_url,
-#             'price': price,
-#         })
-
-#     context = {
-#         'category_products': category_products,
-#         'categories': categories,
-#         'newProducts': new_products_with_images,
-#         'top_selling_products': top_selling_products,
-#         'trending_products': trending_products,
-#         'liked_recommendations': liked_recommendations,
-#         'recommended_user_products': recommended_user_products,
-#         'total_items': total_items,
-#         'cart_items': cart_items,
-#         'room_name': room_name
-#     }
-
-#     return render(request, 'shop/home.html', context)
-
 def send_email(request):
     if request.method == 'POST':
         form = ContactForm(request.POST)
@@ -325,12 +268,17 @@ def add_to_cart(request):
             quantity = int(request.POST.get('quantity', 1))
             
 
-            print(f"product_id: {product_id}, selected_size: {selected_size}, quantity: {quantity}")
+            product = get_object_or_404(Product, pro_id=product_id)  # Lấy product trước
 
-            # Nhận các tùy chọn đường, trà, đá
-            sugar = request.POST.get("sugar", "normal")
-            tea = request.POST.get("tea", "normal")
-            ice = request.POST.get("ice", "normal")
+           # Kiểm tra category name
+            if product.category.name.lower() == 'beverage':
+                sugar = request.POST.get("sugar", "normal")
+                tea = request.POST.get("tea", "normal")
+                ice = request.POST.get("ice", "normal")
+            else:
+                sugar = request.POST.get("sugar", "")
+                tea = request.POST.get("tea", "")
+                ice = request.POST.get("ice", "")
 
             product = get_object_or_404(Product, pro_id=product_id)
             size_option = ProductSize.objects.get(product=product, size=selected_size)
@@ -371,8 +319,6 @@ def add_to_cart(request):
             return redirect(product_detail, product_id)
     else:
         return redirect('homePage')
-
-
     
 #CẬP NHẬT SỐ LƯỢNG PRODUCT TRONG ITEM
 @login_required
@@ -435,6 +381,17 @@ def view_cart(request):
             item.price = product_size.price
             item.total_price = product_size.price * item.quantity
             subtotal_amount += item.total_price
+
+            # Tạo ghi chú nếu có khác bình thường
+            notes = []
+            if item.sugar != '':
+                notes.append(f"Đường: {dict(CartItem._meta.get_field('sugar').choices).get(item.sugar)}")
+            if item.tea != '':
+                notes.append(f"Trà: {dict(CartItem._meta.get_field('tea').choices).get(item.tea)}")
+            if item.ice != '':
+                notes.append(f"Đá: {dict(CartItem._meta.get_field('ice').choices).get(item.ice)}")
+            item.note = ', '.join(notes) if notes else None  # Gán note vào object
+
             valid_cart_items.append(item)
         except ProductSize.DoesNotExist:
             messages.error(request, f"Không tìm thấy giá cho sản phẩm '{item.product.title}' với kích cỡ '{item.size}'")
@@ -1134,7 +1091,7 @@ def payment(request):
         # Tính khoảng cách
         distance = calculate_distance(warehouse_coordinates, delivery_coordinates)
         if distance > 5:
-            messages.error(request, "Địa chỉ giao hàng nằm ngoài bán kính 5km.")
+            messages.error(request, "Địa chỉ giao hàng nằm ngoài bán kính 5km. Vui lòng chọn địa chỉ khác.")
             return redirect('checkOut')
 
         # Voucher handling

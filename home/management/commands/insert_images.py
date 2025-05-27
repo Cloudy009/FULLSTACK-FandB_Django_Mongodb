@@ -7,7 +7,7 @@ class Command(BaseCommand):
     help = 'Thêm ảnh vào các sản phẩm từ file CSV'
 
     def handle(self, *args, **kwargs):
-        csv_file_path = r'E:\LEARN\NAM3\Nam3Ki2\CHUYENNGANH\TMDT\WebBanHang\Web_Ban_Hang\FileCSV\filter_product_success.csv'  # <-- đổi đường dẫn file CSV ở đây
+        csv_file_path = r'static/files/filter_product_success.csv'  # <-- đổi đường dẫn file CSV ở đây
         
         with open(csv_file_path, mode='r', encoding='utf-8') as file:
             reader = csv.DictReader(file)

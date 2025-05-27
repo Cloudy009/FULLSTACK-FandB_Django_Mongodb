@@ -6,6 +6,7 @@
     right: 5px;
     font-family: 'Poppins';
     font-weight: 500;
+    z-index: 99999;
 }
 
 .toast

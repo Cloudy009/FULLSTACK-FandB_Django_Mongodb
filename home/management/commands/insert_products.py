@@ -14,7 +14,7 @@ class Command(BaseCommand):
     help = 'Import products từ file CSV vào database'
 
     def handle(self, *args, **kwargs):
-        csv_file_path = r'recommendations/FileCSV/filter_product_success.csv'  # <-- đổi đường dẫn file CSV ở đây
+        csv_file_path = r'static/files/filter_product_success.csv'  # <-- đổi đường dẫn file CSV ở đây
 
         # Lấy category mặc định
         default_category = Category.objects.get(pk=1)

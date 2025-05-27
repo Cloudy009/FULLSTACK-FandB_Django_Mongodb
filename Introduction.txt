@@ -1,37 +1,82 @@
-- Mở terminal hoặc PowerShell, sau đó chuyển vào thư mục dự án của bạn và tạo môi trường ảo.
+## 🔧 Local Setup
+
+### 1. Clone the project
+git clone https://github.com/yourusername/FandB-Mongodb-django.git
+cd FandB-Mongodb-django
+
+
+### 2. Create and activate virtual environment
+# Create virtual environment
 python -m venv venv_django_mongo
 
-- Kích hoạt môi trường ảo:
-+ Trên Windows:     .\venv_django_mongo\Scripts\activate
-+ Trên macOS/Linux: source venv_django_mongo/bin/activate
 
-- Tải thư viện  
+# Activate (choose OS)
+# On Windows:
+.\venv_django_mongo\Scripts\activate
+
+# On macOS/Linux:
+source venv_django_mongo/bin/activate
+
+
+### 3. Install dependencies
 pip install -r requirements.txt
 
-- Tạo csdl
-+ Tạo một cơ sở dữ liệu mới tên là FandBShop trong MONGODB
-+ Sau đó, cấu hình kết nối trong 'settings.py'
+
+### 4. MongoDB configuration
+Create a MongoDB database named FandBShop
+Update the following section in settings.py:
+
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'FandBShop',  # Tên cơ sở dữ liệu MongoDB của bạn
-        'ENFORCE_SCHEMA': False,  # Bỏ qua việc kiểm tra schema (do MongoDB không sử dụng schema như MySQL)
+        'NAME': 'FandBShop',
+        'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': 'mongodb://localhost:27017',  # Địa chỉ MongoDB, thay đổi nếu bạn dùng host khác
+            'host': 'mongodb://localhost:27017',
         },
     }
 }
 
 
+### 5. Configure .env file
+Create a .env file in the root directory and add:
 
-- Tạo người dùng quản trị và chạy các migration
-python manage.py createsuperuser
-< Sau khi chạy lệnh này, bạn sẽ được yêu cầu nhập tên người dùng, email và mật khẩu cho người dùng quản trị >
 
-- Chạy lệnh migrations: Để tạo các bảng cơ sở dữ liệu từ các models của dự án Django, bạn cần chạy lệnh makemigrations và migrate:
+SECRET_KEY=your-secret-key
+MONGO_URI=mongodb://localhost:27017
+
+# Google OAuth
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY=your-google-key
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET=your-google-secret
+SOCIAL_AUTH_GOOGLE_OAUTH2_REDIRECT_URI=http://127.0.0.1:8000/social-auth/complete/google-oauth2/
+
+# GitHub OAuth
+SOCIAL_AUTH_GITHUB_KEY=your-github-key
+SOCIAL_AUTH_GITHUB_SECRET=your-github-secret
+SOCIAL_AUTH_GITHUB_REDIRECT_URI=http://127.0.0.1:8000/social-auth/complete/github/
+
+# Email config
+EMAIL_HOST_USER=your-email@gmail.com
+EMAIL_HOST_PASSWORD=your-email-app-password
+DEFAULT_FROM_EMAIL=your-email@gmail.com
+DEFAULT_TO_EMAIL=your-email@gmail.com
+
+# VNPAY Payment
+VNPAY_RETURN_URL=http://localhost:8000/shop/payment_return
+VNPAY_PAYMENT_URL=https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+VNPAY_API_URL=https://sandbox.vnpayment.vn/merchant_webapi/api/transaction
+VNPAY_TMN_CODE=your-vnpay-tmn-code
+VNPAY_HASH_SECRET_KEY=your-vnpay-secret-key
+
+DEBUG=True
+
+
+### 6. Apply Migrations
+
 python manage.py makemigrations
 python manage.py migrate
 
+# Fake social_django migrations if needed
 python manage.py migrate social_django 0010 --fake
 python manage.py migrate social_django 0011 --fake
 python manage.py migrate social_django 0012 --fake
@@ -39,8 +84,11 @@ python manage.py migrate social_django 0012 --fake
 python manage.py migrate
 
 
+### 7. Create superuser
+python manage.py createsuperuser
+Follow the prompt to set up the admin credentials.
 
-
-- Khởi động server Django
+### 8. Start development server
 python manage.py runserver
 
+Open in browser: http://127.0.0.1:8000

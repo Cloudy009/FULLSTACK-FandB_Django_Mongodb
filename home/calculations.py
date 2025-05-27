@@ -162,6 +162,41 @@ def get_category_products():
 
     return category_products
 
+# def calculate_month_revenue():
+#     # Lấy ngày hôm nay (dạng date)
+#     today = timezone.now().date()
+
+#     # Lấy thời gian bắt đầu của tháng (ngày 1 của tháng hiện tại)
+#     start_of_month = today.replace(day=1)
+
+#     # Lấy thời gian kết thúc của tháng (ngày cuối cùng của tháng hiện tại)
+#     next_month = today.replace(day=28) + timezone.timedelta(days=4)  # Đảm bảo luôn có ngày 1 của tháng tiếp theo
+#     end_of_month = next_month.replace(day=1) - timezone.timedelta(days=1)
+
+#     # Lọc các hóa đơn được tạo trong tháng này
+#     hoa_dons_this_month = HoaDon.objects.filter(
+#         created_at__gte=start_of_month, 
+#         created_at__lte=end_of_month
+#     )
+
+#     # Tính tổng doanh thu trong tháng này
+#     total_revenue_month = hoa_dons_this_month.aggregate(total_revenue=Sum('tongTien'))['total_revenue'] or 0
+
+#     return total_revenue_month
+
+# Djongo không hỗ trợ đầy đủ các phép toán aggregation như Sum(), Avg() trong Django ORM.
+# sẽ không hoạt động đúng hoặc gây lỗi khi dùng MongoDB vì 
+# Djongo không ánh xạ chính xác các phép toán này sang cú pháp aggregation của MongoDB.
+
+# Do đó, ta phải lấy toàn bộ giá trị tongTien trước (qua .values_list(..., flat=True)) và tính tổng trong Python.
+# Đồng thời, vì MongoDB có thể trả về Decimal128 (kiểu số thập phân riêng của BSON), nên cần xử lý:
+
+# Decimal128 → .to_decimal()
+
+# Decimal → dùng trực tiếp
+
+# str hoặc float → ép về Decimal
+
 def calculate_month_revenue():
     # Lấy ngày hôm nay
     today = timezone.now().date()
@@ -190,25 +225,26 @@ def calculate_month_revenue():
     return total
 
 def calculate_day_revenue():
-    # Lấy ngày hôm nay (dạng date)
     today = datetime.today().date()
-
-    # Lấy thời gian bắt đầu của ngày hôm nay (00:00:00)
     start_of_day = datetime.combine(today, datetime.min.time())
-
-    # Lấy thời gian kết thúc của ngày hôm nay (23:59:59.999999)
     end_of_day = datetime.combine(today, datetime.max.time())
 
-    # Lọc các hóa đơn được tạo trong ngày hôm nay
     hoa_dons_today = HoaDon.objects.filter(
-        created_at__gte=start_of_day, 
+        created_at__gte=start_of_day,
         created_at__lt=end_of_day
     )
 
-    # Tính tổng doanh thu trong ngày hôm nay
-    total_revenue_today = hoa_dons_today.aggregate(total_revenue=Sum('tongTien'))['total_revenue'] or 0
+    total_revenue_today = Decimal(0)
+
+    for hoa_don in hoa_dons_today:
+        tong_tien = hoa_don.tongTien
+        if isinstance(tong_tien, Decimal128):
+            total_revenue_today += tong_tien.to_decimal()
+        elif isinstance(tong_tien, (Decimal, float, int)):
+            total_revenue_today += Decimal(tong_tien)
 
     return total_revenue_today
+
 
 def calculate_daily_products_sold():
     # Lấy thời gian hiện tại

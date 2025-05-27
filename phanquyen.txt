@@ -1,0 +1,92 @@
+Django có hệ thống phân quyền tích hợp, dựa trên 3 thành phần chính:
+
+User: đại diện cho người dùng.
+Group: nhóm người dùng, giúp gán quyền cho nhiều user cùng lúc.
+Permission: quyền hạn cụ thể, xác định hành động được phép thực hiện.
+
+Khi ta tạo một model trong Django và chạy lệnh migrate, Django tự động tạo 4 quyền mặc định cho model đó:
+add_modelname	    Quyền thêm mới đối tượng
+change_modelname	Quyền sửa đổi đối tượng
+delete_modelname	Quyền xóa đối tượng
+view_modelname	    Quyền xem chi tiết đối tượng
+
+Quyền được lưu trong bảng auth_permission.
+Mỗi quyền liên kết với một ContentType (đại diện cho model).
+Bảng auth_user_user_permissions lưu quyền gán trực tiếp cho user.
+Bảng auth_group_permissions lưu quyền gán cho nhóm.
+Bảng auth_user_groups lưu user thuộc nhóm nào.
+
+
+Kiểm tra quyền của user — Hàm User.has_perm()
+File: django/contrib/auth/models.py
+Hàm: User.has_perm(self, perm, obj=None)
+def has_perm(self, perm, obj=None):
+    # Nếu user là superuser thì có tất cả quyền
+    if self.is_active and self.is_superuser:
+        return True
+
+    # Nếu không kiểm tra object-level permission (mặc định Django không hỗ trợ)
+    if obj is not None:
+        return _user_has_object_perm(self, perm, obj)
+
+    # Kiểm tra quyền model-level
+    return _user_has_perm(self, perm)
+
+perm là chuỗi định danh quyền, ví dụ 'shop.add_product'.
+obj là đối tượng cụ thể (mặc định là None).
+Mặc định Django không hỗ trợ phân quyền object-level, cần thư viện mở rộng nếu muốn.
+
+
+
+Kiểm tra quyền trong view — Decorator permission_required
+File: django/contrib/auth/decorators.py
+Hàm: permission_required(perm, login_url=None, raise_exception=False)
+def permission_required(perm, login_url=None, raise_exception=False):
+    def decorator(view_func):
+        @wraps(view_func)
+        def _wrapped_view(request, *args, **kwargs):
+            # Nếu user chưa đăng nhập thì redirect tới login
+            if not request.user.is_authenticated:
+                return redirect_to_login(request.get_full_path(), login_url)
+
+            # Kiểm tra quyền user
+            if not request.user.has_perm(perm):
+                if raise_exception:
+                    # Trả về lỗi 403 nếu không có quyền
+                    raise PermissionDenied
+                # Nếu không có quyền, redirect tới login hoặc trang khác
+                return redirect_to_login(request.get_full_path(), login_url)
+
+            # Nếu có quyền, gọi view gốc
+            return view_func(request, *args, **kwargs)
+        return _wrapped_view
+    return decorator
+perm: quyền cần kiểm tra.
+login_url: URL trang login (mặc định).
+raise_exception: nếu True, trả lỗi 403 thay vì redirect.
+
+
+
+5. Phân quyền trong Django Admin
+5.1. Vị trí file và class
+File: django/contrib/admin/options.py
+
+Class: ModelAdmin
+
+5.2. Các phương thức kiểm tra quyền
+has_add_permission(self, request)
+has_change_permission(self, request, obj=None)
+has_delete_permission(self, request, obj=None)
+has_view_permission(self, request, obj=None)
+
+Các phương thức này gọi request.user.has_perm() với quyền tương ứng.
+Admin dựa vào kết quả kiểm tra để hiển thị hoặc ẩn các nút thao tác.
+
+User gửi yêu cầu (request) đến một URL.
+Django định tuyến request đến view tương ứng.
+Nếu view được bảo vệ bằng decorator @permission_required, 
+decorator gọi user.has_perm(perm) để kiểm tra quyền.
+
+has_perm kiểm tra quyền trong database (trực tiếp hoặc qua nhóm).
+Nếu user có quyền, view được thực thi. Nếu không, trả về lỗi 403 hoặc redirect đến trang đăng nhập.
+Trong admin, các hàm has_*_permission được gọi để kiểm tra quyền trước khi cho phép thao tác.

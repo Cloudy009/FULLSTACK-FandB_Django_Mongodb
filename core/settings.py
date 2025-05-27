@@ -29,6 +29,7 @@ if not SECRET_KEY:
 
 # Render Deployment Code
 DEBUG = os.environ.get('DEBUG', 'False').lower() in ('true', '1', 'yes')
+
 # HOSTs List
 ALLOWED_HOSTS = ['*']
 

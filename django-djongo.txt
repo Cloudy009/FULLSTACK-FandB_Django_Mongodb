@@ -1,0 +1,158 @@
+Djongo là một thư viện cho phép ta dùng MongoDB như một cơ sở dữ liệu backend trong Django, 
+mà không cần viết Mongo query.
+Thay vào đó, 
+ta dùng ORM quen thuộc của Django, 
+và Djongo sẽ dịch các truy vấn SQL sang MongoDB phía sau hậu trường.
+
+djongo/
+├── base.py                 ← Quản lý kết nối & tích hợp ORM
+├── cursor.py               ← Giao tiếp với MongoDB (thực thi truy vấn)
+├── operations.py           ← Thực thi các lệnh như INSERT, UPDATE
+├── introspection.py        ← Dùng khi chạy migrate
+├── schema.py               ← Giả lập schema (Mongo không có schema)
+└── sql2mongo/
+    ├── query.py            ← Phân tích truy vấn SQL
+    ├── converters.py       ← Dịch sang Mongo query
+    ├── translator.py       ← Bộ chuyển đổi chính từ SQL → Mongo
+
+✅ djongo.base.DatabaseWrapper
+Đây là file cực quan trọng. 
+Nó kế thừa từ Django’s BaseDatabaseWrapper và gắn kết toàn bộ hoạt động ORM vào MongoDB.
+
+# djongo/base.py
+class DatabaseWrapper(BaseDatabaseWrapper):
+    vendor = 'djongo'
+
+    def get_connection_params(self):
+        return {
+            'name': self.settings_dict.get('NAME'),
+            ...
+        }
+
+    def get_new_connection(self, conn_params):
+        # Tạo MongoClient kết nối tới MongoDB
+        return connect(
+            db=conn_params['name'],
+            host=conn_params['host'],
+            ...
+        )
+
+    def create_cursor(self, name=None):
+        # Trả về cursor dùng để thực hiện truy vấn
+        return Cursor(self.connection)
+
+✅ djongo/cursor.py: # djongo/cursor.py
+# djongo/cursor.py
+class Cursor:
+    def execute(self, sql, params=None):
+        self.db_ops = SQLCompiler(sql, params)
+        self.db_ops.execute()
+
+    def fetchone(self):
+        return self.db_ops.result.fetchone()
+Nhận SQL từ Django ORM
+Gọi SQLCompiler (bên trong sql2mongo) để dịch SQL sang Mongo query
+Gửi truy vấn tới MongoDB và trả về kết quả
+
+✅ djongo/sql2mongo/translator.py
+# djongo/sql2mongo/translator.py
+class Translator:
+    def translate(self, sql):
+        parsed = self._parse(sql)
+        mongo_query = self._convert_to_mongo(parsed)
+        return mongo_query
+Nhận câu SQL (do Django tạo ra)
+Phân tích nó (parse)
+Dịch sang câu lệnh Mongo (dictionary query)
+
+✅ 4. djongo/operations.py
+Hỗ trợ lệnh INSERT, UPDATE, DELETE
+Djongo sẽ xử lý và chuyển thành thao tác ghi tương ứng của Mongo.
+
+
+✅ 5. djongo/schema.py – Giả lập schema
+MongoDB là NoSQL, không có khái niệm schema như SQL. Nhưng Django thì cần migrate, makemigrations...
+👉 File này giúp giả lập một schema tạm thời, để Django không bị lỗi khi chạy các lệnh makemigrations, migrate.
+
+
+🔁 Quy trình hoạt động khi bạn gọi ORM
+✅ Bước 1: Giả sử bạn có model trong Django
+# models.py
+from django.db import models
+
+class Book(models.Model):
+    title = models.CharField(max_length=100)
+    author = models.CharField(max_length=100)
+Và bạn đã chạy makemigrations + migrate, Djongo sẽ tự tạo collection book trong MongoDB.
+
+✅ Bước 2: Bạn gọi câu ORM trong view hoặc shell
+Book.objects.filter(title='Python')
+
+🔁 Quy trình hoạt động từng bước bên trong Djongo
+🧩 Bước 3: Django ORM tạo ra SQL
+Django nội bộ chuyển câu lệnh ORM này thành SQL sau:
+SELECT "book"."id", "book"."title", "book"."author"
+FROM "book"
+WHERE "book"."title" = 'Python'
+
+🧩 Bước 4: Django gọi DatabaseWrapper.create_cursor() từ base.py
+# base.py
+def create_cursor(self, name=None):
+    return Cursor(self.connection)
+Trả về một đối tượng Cursor.
+
+🧩 Bước 5: Gọi cursor.execute(sql) → dịch SQL sang Mongo
+# cursor.py
+class Cursor:
+    def execute(self, sql, params=None):
+        self.db_ops = SQLCompiler(sql, params)
+        self.db_ops.execute()
+Trong đó:
+SQLCompiler gọi tiếp tới Translator bên trong djongo/sql2mongo/translator.py.
+
+🧩 Bước 6: Translator phân tích SQL → Mongo
+# translator.py
+class Translator:
+    def translate(self, sql):
+        parsed = self._parse(sql)
+        mongo_query = self._convert_to_mongo(parsed)
+        return mongo_query
+Với SQL ở trên, Translator sẽ tạo ra MongoDB query tương đương:
+{
+    'filter': {'title': 'Python'},
+    'projection': {'_id': 1, 'title': 1, 'author': 1},
+    'collection': 'book'
+}
+
+🧩 Bước 7: Gửi truy vấn Mongo qua pymongo
+Djongo dùng pymongo để thực hiện:
+db['book'].find(
+    {'title': 'Python'},
+    {'_id': 1, 'title': 1, 'author': 1}
+)
+MongoDB sẽ trả về kết quả:
+[
+    {"_id": ObjectId("..."), "title": "Python", "author": "John Doe"}
+]
+
+🧩 Bước 8: Djongo trả kết quả về Django ORM
+Djongo sẽ convert mỗi document MongoDB thành object Book:
+Book(id=..., title='Python', author='John Doe')
+Và kết quả sẽ là một QuerySet chứa các object Book.
+
+✅ Tóm lại quy trình với sơ đồ chữ:
+Book.objects.filter(title='Python')
+        ↓
+Django ORM → SQL: SELECT * FROM book WHERE title='Python'
+        ↓
+Djongo.base.DatabaseWrapper.create_cursor()
+        ↓
+cursor.execute(sql)
+        ↓
+→ Translator.translate(sql)
+        ↓
+→ MongoDB query: db.book.find({'title': 'Python'})
+        ↓
+→ Nhận kết quả từ MongoDB
+        ↓
+→ Convert → [Book(...), Book(...)]
